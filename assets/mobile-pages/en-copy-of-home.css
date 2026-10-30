@@ -1,0 +1,21 @@
+/* Phone layout for anh-thu-kresimir/copy-of-home.html; preserves the edited page content. */
+@media (max-width:767px){
+#o9y9h{--mobile-unit:calc(100vw / 320);}
+
+#o9y9h{width:100%!important;min-width:0!important;left:0!important;margin-left:0!important;}
+[data-mesh-id=Containero9y9hinlineContent-gridContainer]{display:block!important;width:100%!important;min-width:0!important;}
+#o9y9h .wixui-section,#o9y9h .wixui-column-strip,#o9y9h .wixui-column-strip__column{width:100%!important;min-width:0!important;left:0!important;margin:0!important;}
+#o9y9h [data-mesh-id$=inlineContent],#o9y9h [data-mesh-id$=inlineContent-gridContainer]{width:100%!important;min-width:0!important;}
+[data-mesh-id=comp-mn1uzggb4inlineContent-gridContainer]{min-height:calc(300 * var(--mobile-unit))!important;}
+#comp-mn1uzggf9{position:relative!important;left:0!important;grid-area:1/1/2/2!important;width:calc(280 * var(--mobile-unit))!important;margin:calc(20 * var(--mobile-unit)) auto!important;justify-self:center!important;}
+[data-mesh-id=comp-mn1uzggf9inlineContent-gridContainer]{min-height:calc(446 * var(--mobile-unit))!important;}
+#comp-mn1uzggf9 [data-mesh-id$=inlineContent-wedge-3]{height:calc(402 * var(--mobile-unit))!important;}
+#comp-mn1uzggl2{left:auto!important;right:0!important;justify-self:end!important;}
+[data-mesh-id=comp-mn1uzggm9inlineContent-gridContainer]{position:relative!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:1fr!important;min-height:0!important;}
+#comp-mn1uzggm18,#comp-mn1uzggp5{position:relative!important;left:0!important;top:0!important;width:100%!important;height:calc(300 * var(--mobile-unit))!important;margin:0!important;align-self:stretch!important;}
+#comp-mn1uzggm18{grid-area:1/1/2/2!important;}
+#comp-mn1uzggp5{grid-area:1/2/2/3!important;}
+[data-mesh-id=comp-mn1uzggp11-rotated-wrapper],[data-mesh-id=comp-mn1uzggr-rotated-wrapper]{display:none!important;}
+#o9y9h .yt-films,#o9y9h .wp-photos{position:relative!important;left:0!important;margin:0!important;width:100%!important;box-sizing:border-box!important;grid-area:auto!important;}
+
+}
