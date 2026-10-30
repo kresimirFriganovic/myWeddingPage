@@ -4,6 +4,8 @@
 
   var mobile = window.matchMedia('(max-width: 767px)');
   var view = null;
+  var languageMenuKey = 'wedding-mobile-language-menu';
+  var languageMenuParam = 'wedding-menu';
   var language = (document.documentElement.lang || 'en').slice(0, 2);
   var labels = {
     en: { menu: 'Menu', close: 'Close menu', navigation: 'Site navigation', languages: 'Language', expand: 'Show submenu for ', top: 'Back to top' },
@@ -77,6 +79,7 @@
     nav.setAttribute('aria-label', text.languages);
     Array.prototype.forEach.call(sourceLinks, function (source) {
       var link = copyLink(source, 'tk-mobile-menu-language');
+      link.href = languageTarget(source).href;
       var flag = source.querySelector('img');
       if (flag) link.insertBefore(flag.cloneNode(true), link.firstChild);
       if (source.getAttribute('aria-current') === 'true' || source.classList.contains('cur')) {
@@ -86,6 +89,68 @@
       nav.appendChild(link);
     });
     return nav;
+  }
+
+  function languageTarget(source) {
+    var target = new URL(source.href, location.href);
+    var nextLanguage = source.getAttribute('lang');
+    var current = new URL(location.href);
+    // Keep the current page when changing language, including under a preview
+    // directory or a GitHub Pages repository prefix.
+    var route = current.pathname.match(/^(.*\/)anh-thu-kresimir(?:\.html|\/(.*))$/);
+    if (target.origin === current.origin && route && /^(en|hr|vi)$/.test(nextLanguage)) {
+      var page = route[2] || '';
+      if (/^(hr|vi)\.html$/.test(page)) page = '';
+      else page = page.replace(/^(hr|vi)\//, '');
+      if (!page || /^[^/]+\.html$/.test(page)) {
+        target.pathname = route[1] + 'anh-thu-kresimir' + (page
+          ? '/' + (nextLanguage === 'en' ? '' : nextLanguage + '/') + page
+          : nextLanguage === 'en' ? '.html' : '/' + nextLanguage + '.html');
+      }
+      target.search = current.search;
+      target.searchParams.delete(languageMenuParam);
+      target.hash = current.hash;
+    }
+    return target;
+  }
+
+  function changeLanguage(event, link) {
+    // Anchors can change after the menu was created (for example gallery tabs).
+    // Refresh the real href before the browser handles ordinary or modified clicks.
+    var target = languageTarget(link);
+    link.href = target.href;
+    // Preserve browser shortcuts such as Command/Ctrl-click and opening a new tab.
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') return;
+    if (target.origin !== location.origin) return;
+    if (link.getAttribute('lang') === language) {
+      event.preventDefault();
+      return;
+    }
+    try {
+      sessionStorage.setItem(languageMenuKey, JSON.stringify({ href: target.href, expires: Date.now() + 60000 }));
+    } catch (error) {
+      // Private browsing can disable storage. Carry the one-use intent in the
+      // destination URL instead, and remove it as soon as the menu is restored.
+      target.searchParams.set(languageMenuParam, 'open');
+    }
+    event.preventDefault();
+    location.assign(target.href);
+  }
+
+  function restoreLanguageMenu() {
+    var current = new URL(location.href);
+    var restore = current.searchParams.get(languageMenuParam) === 'open';
+    if (restore) {
+      current.searchParams.delete(languageMenuParam);
+      try { history.replaceState(history.state, '', current.href); }
+      catch (error) { /* Still restore the menu if URL cleanup is unavailable. */ }
+    }
+    try {
+      var pending = JSON.parse(sessionStorage.getItem(languageMenuKey) || 'null');
+      sessionStorage.removeItem(languageMenuKey);
+      if (pending && pending.href === current.href && pending.expires > Date.now()) restore = true;
+    } catch (error) { /* The URL fallback works without storage. */ }
+    if (restore) openMenu();
   }
 
   function focusableItems() {
@@ -117,6 +182,9 @@
 
   function openMenu() {
     if (!view || !mobile.matches || view.panel.hasAttribute('open')) return;
+    Array.prototype.forEach.call(view.panel.querySelectorAll('.tk-mobile-menu-language'), function (link) {
+      link.href = languageTarget(link).href;
+    });
     view.previousFocus = document.activeElement;
     if (typeof view.panel.showModal === 'function') view.panel.showModal();
     else view.panel.setAttribute('open', '');
@@ -230,12 +298,18 @@
       if (view && view.panel === panel) finishClose(false);
     });
     panel.addEventListener('click', function (event) {
-      if (event.target.closest('a[href]')) closeMenu(false);
+      var link = event.target.closest('a[href]');
+      if (link && link.classList.contains('tk-mobile-menu-language')) {
+        changeLanguage(event, link);
+        return;
+      }
+      if (link) closeMenu(false);
     });
     document.addEventListener('keydown', onKeydown);
     document.addEventListener('focusin', onFocus);
     window.addEventListener('scroll', updateBackToTop, { passive: true });
     updateBackToTop();
+    restoreLanguageMenu();
   }
 
   function unmount() {

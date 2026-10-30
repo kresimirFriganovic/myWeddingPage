@@ -67,7 +67,7 @@
     });
   }
   function initMusic(){
-    // Home page: the video plays once, then keeps looping its last 5 seconds.
+    // Home page: play once, then repeat the ending with a responsive loop length.
     // The song plays alongside; the button only mutes/unmutes it and never restarts the video.
     var v=document.getElementById('comp-mfm9dnps1_video');if(!v)return;
     var title=document.getElementById('comp-mgmgm4de');
@@ -83,13 +83,13 @@
     var ON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
     var OFF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
     function render(){var on=started&&!muted&&!a.paused;btn.innerHTML=on?ON:OFF;btn.setAttribute('aria-label',on?'Mute music':'Play music');btn.title=btn.getAttribute('aria-label');btn.classList.toggle('is-off',!on);hint.hidden=started||muted||a.ended;}
-    // video: plays once, then loops its last 25 seconds with a crossfade between two copies
-    var LOOP=25,FADE=1.2,TITLE_AT=5;
+    // Phones repeat the last 10 seconds; keep the existing desktop loop unchanged.
+    var loopMedia=window.matchMedia('(max-width: 767px)'),FADE=1.2,TITLE_AT=5;
     v.loop=false;v.removeAttribute('loop');
     var c=v.cloneNode(false);c.removeAttribute('id');c.removeAttribute('autoplay');c.removeAttribute('data-local-video');c.classList.add('tk-vclone');c.muted=true;c.preload='auto';
     v.parentNode.insertBefore(c,v.nextSibling);
     var front=v,back=c,swapping=false;
-    function loopStart(x){return Math.max(0,(x.duration||LOOP)-LOOP);}
+    function loopStart(x){var seconds=loopMedia.matches?10:25;return Math.max(0,(x.duration||seconds)-seconds);}
     function tick(){
       var d=front.duration;
       if(d&&!swapping&&front.currentTime>=d-FADE-0.15){
